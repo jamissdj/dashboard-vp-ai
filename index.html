@@ -596,8 +596,7 @@ function togglePanelBitacora() {
   <div class="two-col">
     <div class="card">
       <h3>Composición de la Facturación</h3>
-      <div style="height:175px;position:relative;"><canvas id="chartFac"></canvas></div>
-      <div style="margin-top:14px;">
+      <div style="margin-top:4px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:12px;">Con PO (facturado)</span><strong id="lbl-conPO">$1,276,643 (51%)</strong></div>
         <div class="progress-wrap"><div class="progress-bar" id="bar-conPO" style="width:51%;background:var(--green);"></div></div>
         <div style="display:flex;justify-content:space-between;margin-top:9px;margin-bottom:5px;"><span style="font-size:12px;">BAU SOW 2026</span><strong id="lbl-bau">$786,160 (31%)</strong></div>
@@ -935,7 +934,37 @@ function togglePanelBitacora() {
   <div class="card" style="margin-top:8px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
       <h3 style="margin:0;">⚖️ Provisión Indemnización</h3>
-      <div style="font-size:10px;color:#64748b;" id="indem-header-meta">COL: Art. 64 CST · PAN: Art. 225 CT · a <span id="indem-fecha-corte"></span></div>
+      <div style="font-size:10px;color:#64748b;display:flex;align-items:center;gap:8px;flex-wrap:wrap;" id="indem-header-meta">
+        <span style="position:relative;display:inline-block;">
+          <span onclick="toggleIndemInfo('indem-info-col')" style="cursor:pointer;color:#2563eb;font-weight:600;text-decoration:underline dotted;">COL: Art. 64 CST</span>
+          <div id="indem-info-col" style="display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:300;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:12px 14px;min-width:260px;text-align:left;font-weight:400;" onclick="event.stopPropagation()">
+            <div style="font-weight:700;font-size:11px;color:#1e40af;margin-bottom:6px;">🇨🇴 Colombia — Art. 64 CST</div>
+            <div style="font-size:11px;color:#334155;line-height:1.6;">
+              <strong>Despido sin justa causa</strong> (salario ≤ 10 SMMLV):<br>
+              • <b>Menos de 1 año:</b> 30 días de salario × fracción del año<br>
+              • <b>1er año completo:</b> 30 días de salario<br>
+              • <b>Por cada año adicional:</b> +20 días de salario<br><br>
+              <span style="color:#64748b;font-size:10px;">Salario día = Sal/mes ÷ 30</span>
+            </div>
+          </div>
+        </span>
+        <span style="color:#94a3b8;">·</span>
+        <span style="position:relative;display:inline-block;">
+          <span onclick="toggleIndemInfo('indem-info-pan')" style="cursor:pointer;color:#059669;font-weight:600;text-decoration:underline dotted;">PAN: Art. 225 CT</span>
+          <div id="indem-info-pan" style="display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:300;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:12px 14px;min-width:270px;text-align:left;font-weight:400;" onclick="event.stopPropagation()">
+            <div style="font-weight:700;font-size:11px;color:#065f46;margin-bottom:6px;">🇵🇦 Panamá — Art. 225 CT</div>
+            <div style="font-size:11px;color:#334155;line-height:1.6;">
+              <strong>Despido sin justa causa:</strong><br>
+              • <b>0–2 años:</b> 3.4 semanas de salario/año<br>
+              • <b>2–5 años:</b> 6 semanas de salario/año<br>
+              • <b>Más de 5 años:</b> 7 semanas de salario/año<br><br>
+              <span style="color:#64748b;font-size:10px;">Semana = Sal/mes × 12 ÷ 52</span>
+            </div>
+          </div>
+        </span>
+        <span style="color:#94a3b8;">· a <span id="indem-fecha-corte"></span></span>
+        <span id="indem-sync-badge" style="display:none;background:#dcfce7;color:#15803d;font-size:9px;padding:1px 5px;border-radius:8px;"></span>
+      </div>
     </div>
     <!-- KPIs resumen -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
@@ -2487,19 +2516,24 @@ function renderKPIs() {
   balRes.textContent = (resultado < 0 ? '– ' : '+ ') + fmt(Math.abs(resultado));
   balRes.className = resultado < 0 ? 'red' : 'green';
 
+  // BAU SOW 2026 = valor específico de la(s) PO BAU en facturadas
+  const facBAU = state.facturadas
+    .filter(f => f.nombre && f.nombre.toLowerCase().includes('bau sow 2026'))
+    .reduce((s, f) => s + (f.valor || 0), 0);
   const pctReal = facTotal > 0 ? Math.round(facReal / facTotal * 100) : 0;
+  const pctBAU  = facTotal > 0 ? Math.round(facBAU  / facTotal * 100) : 0;
   const pctPend = facTotal > 0 ? Math.round(facPendiente / facTotal * 100) : 0;
   const lbl1 = document.getElementById('lbl-conPO');
   const lbl2 = document.getElementById('lbl-bau');
   const lbl3 = document.getElementById('lbl-sinPO');
   if (lbl1) lbl1.textContent = fmt(facReal) + ' (' + pctReal + '%)';
-  if (lbl2) lbl2.textContent = fmt(facNomina) + ' de nómina';
+  if (lbl2) lbl2.textContent = fmt(facBAU) + ' (' + pctBAU + '%)';
   if (lbl3) lbl3.textContent = fmt(facPendiente) + ' (' + pctPend + '%)';
   const b1 = document.getElementById('bar-conPO');
   const b2 = document.getElementById('bar-bau');
   const b3 = document.getElementById('bar-sinPO');
   if (b1) b1.style.width = pctReal + '%';
-  if (b2) b2.style.width = (facTotal > 0 ? Math.round(facNomina/facTotal*100) : 0) + '%';
+  if (b2) b2.style.width = pctBAU + '%';
   if (b3) b3.style.width = pctPend + '%';
 
   const { ideal, acido } = calcEscenarios();
@@ -4007,19 +4041,7 @@ function confirmarCambioEstado() {
 // =============================================
 // CHART
 // =============================================
-let chartFac;
-function renderChart() {
-  if (chartFac) chartFac.destroy();
-  chartFac = new Chart(document.getElementById('chartFac'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Con PO', 'BAU SOW 2026', 'Sin PO (pendiente)'],
-      datasets: [{ data: [state.facturacion.conPO, state.facturacion.bau, state.facturacion.sinPO],
-        backgroundColor: ['#16a34a', '#7c3aed', '#d97706'], borderWidth: 0 }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
-  });
-}
+function renderChart() { /* gráfica de dona eliminada — reemplazada por barras de progreso */ }
 
 // =============================================
 // ACTIONS: FACTURAR
@@ -5425,16 +5447,33 @@ const LEAL_EMPLEADOS_INDEM = [
 ];
 
 function calcIndemCOL(anosDecimal, salMes) {
-  // Art. 64 CST: 30 días (1 mes) por 1er año + 20 días por año adicional
+  // Art. 64 CST — Despido sin justa causa (salario ≤ 10 SMMLV)
+  // Menos de 1 año: 30 días de salario (proporcional al tiempo)
+  // 1er año completo: 30 días
+  // Por cada año adicional: 20 días más
   if (anosDecimal < 1/12) return 0;
-  if (anosDecimal < 1) return anosDecimal * salMes; // proporcional
-  return salMes + Math.max(0, anosDecimal - 1) * (20/30) * salMes;
+  const salDia = salMes / 30;
+  if (anosDecimal < 1) return salDia * 30 * anosDecimal; // proporcional < 1 año
+  return salDia * 30 + salDia * 20 * Math.max(0, anosDecimal - 1);
 }
 
 function calcIndemPAN(anosDecimal, salMes) {
-  // Art. 225 CT Panamá: prima antigüedad 1.92% del salario/mes × meses trabajados
-  const meses = anosDecimal * 12;
-  return 0.0192 * salMes * meses;
+  // Art. 225 CT Panamá — Despido sin justa causa
+  // < 2 años:  3.4 semanas de salario por año trabajado
+  // 2–5 años:  6 semanas por año
+  // > 5 años:  7 semanas por año
+  // Salario semanal = salMes × 12 / 52
+  const salSemana = salMes * 12 / 52;
+  let semanasTotal = 0;
+  if (anosDecimal <= 0) return 0;
+  if (anosDecimal <= 2) {
+    semanasTotal = 3.4 * anosDecimal;
+  } else if (anosDecimal <= 5) {
+    semanasTotal = 3.4 * 2 + 6 * (anosDecimal - 2);
+  } else {
+    semanasTotal = 3.4 * 2 + 6 * 3 + 7 * (anosDecimal - 5);
+  }
+  return salSemana * semanasTotal;
 }
 
 // Estado de sort/filtro del panel indemnización
@@ -5453,9 +5492,15 @@ function renderIndemnizacion() {
 
   // Badge sync
   const metaEl = document.getElementById('indem-header-meta');
-  if (metaEl && _vacSync) {
+  // Solo actualizar la fecha de corte y el badge de sync — no pisar los popups del header
+  if (el('indem-fecha-corte')) el('indem-fecha-corte').textContent = fechaCorte;
+  const syncBadge = document.getElementById('indem-sync-badge');
+  if (_vacSync) {
     const sincFecha = new Date(_vacSync.actualizadoEn).toLocaleDateString('es-CO', {day:'2-digit',month:'short',year:'numeric'});
-    metaEl.innerHTML = `COL: Art. 64 CST · PAN: Art. 225 CT · a <span id="indem-fecha-corte">${fechaCorte}</span> <span style="background:#dcfce7;color:#15803d;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:6px;">🔗 Sync ${sincFecha}</span>`;
+    if (syncBadge) {
+      syncBadge.textContent = '🔗 Sync ' + sincFecha;
+      syncBadge.style.display = 'inline';
+    }
   }
 
   // Salario promedio de respaldo
@@ -5594,6 +5639,29 @@ function filtrarIndem() {
   if (el('indem-pan-total')) el('indem-pan-total').textContent = fmt(Math.round(totalPAN));
   const countEl = document.getElementById('indem-count');
   if (countEl) countEl.textContent = datos.length + ' empleados';
+}
+
+function toggleIndemInfo(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const visible = el.style.display !== 'none';
+  // cerrar todos primero
+  ['indem-info-col','indem-info-pan'].forEach(i => {
+    const e = document.getElementById(i);
+    if (e) e.style.display = 'none';
+  });
+  if (!visible) {
+    el.style.display = 'block';
+    // cerrar al hacer click fuera
+    setTimeout(() => {
+      document.addEventListener('click', function closeInfo(ev) {
+        if (!el.contains(ev.target)) {
+          el.style.display = 'none';
+          document.removeEventListener('click', closeInfo);
+        }
+      });
+    }, 0);
+  }
 }
 
 function toggleIndemSort() {
