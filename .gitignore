@@ -1,0 +1,15 @@
+# ===========================================================
+#  .gitignore — Repo dashboard-vp-ai
+#  Solo se publica el tablero (index.html). Todo lo demas se ignora.
+# ===========================================================
+
+# Ignorar TODO por defecto...
+*
+
+# ...pero permitir explicitamente lo que SI se publica:
+!.gitignore
+!README.md
+!index.html
+
+# Nota: dashboard_presupuesto.html se copia a index.html al publicar,
+# por eso NO se sube el original (solo el index.html resultante).
