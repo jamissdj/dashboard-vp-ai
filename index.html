@@ -832,7 +832,7 @@ function togglePanelBitacora() {
         <span style="background:#ede9fe;color:#5b21b6;padding:2px 6px;border-radius:4px;">🔒 $0</span>
       </div>
       <div style="font-size:10px;color:var(--blue);margin-top:8px;">👆 Ver detalle</div>
-    </div><div class="capex-card" style="cursor:pointer;transition:box-shadow .15s;" onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseleave="this.style.boxShadow=''" onclick="mostrarDetalleCapex('LC','Capex')">
+    </div><div class="capex-card" style="cursor: pointer; transition: box-shadow 0.15s;" onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseleave="this.style.boxShadow=''" onclick="mostrarDetalleCapex('LC','Capex')">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div class="capex-market">LC</div>
         <div style="display:flex;gap:4px;align-items:center;">
@@ -2989,8 +2989,8 @@ function togglePanelBitacora() {
 <div class="modal-bg" id="modalEditarReserva">
   <div class="modal" style="max-width:420px;">
     <h2>Editar Reserva</h2>
-    <p id="edit-res-context" style="font-size:12px;color:var(--muted);margin-bottom:12px;">Capex · LC</p>
-    <input type="hidden" id="edit-res-itemIdx" value="3">
+    <p id="edit-res-context" style="font-size:12px;color:var(--muted);margin-bottom:12px;"></p>
+    <input type="hidden" id="edit-res-itemIdx">
     <div class="form-grid">
       <div class="form-group form-full"><label>Descripción</label><input type="text" id="edit-res-desc"></div>
       <div class="form-group"><label>Proveedor</label><input type="text" id="edit-res-proveedor"></div>
@@ -3029,10 +3029,10 @@ function togglePanelBitacora() {
 </div>
 
 <!-- MODAL: RESERVA / LÍNEA OPEX -->
-<div class="modal-bg" id="modalReserva" data-mercado="LC" data-tipo="Capex">
+<div class="modal-bg" id="modalReserva">
   <div class="modal" style="max-width:460px;">
-    <h2 id="modal-reserva-titulo">🔒 Agregar Reserva de Presupuesto</h2>
-    <p id="modal-reserva-context" style="font-size:12px;color:var(--muted);margin-bottom:14px;">Capex · LC — La reserva reducirá el presupuesto disponible sin crear una iniciativa en el pipeline.</p>
+    <h2 id="modal-reserva-titulo">🔒 Agregar Reserva</h2>
+    <p id="modal-reserva-context" style="font-size:12px;color:var(--muted);margin-bottom:14px;"></p>
     <div class="form-grid">
       <div class="form-group form-full">
         <label>Descripción</label>
@@ -3492,7 +3492,7 @@ function togglePanelBitacora() {
 </div>
 
 <!-- TOAST -->
-<div class="toast success" id="toast">✅ Reserva actualizada</div>
+<div class="toast" id="toast"></div>
 
 <script>
 
